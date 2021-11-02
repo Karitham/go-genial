@@ -63,7 +63,37 @@ func (c *Client) GetPetByID(petID uint) *Pet {
 }
 `,
 		},
+		{
+			name: "with receiver and variadic",
+			fields: fields{
+				name: "GetPetsByTags",
+				receiver: Parameter{
+					Name: "c",
+					Type: "*Client",
+				},
+				parameters: []Parameter{
+					{
+						Name: "tags",
+						Type: "...string",
+					},
+				},
+				comment: "GetPetsByTags gets multiple pets by tags",
+				returnType: []Parameter{
+					{
+						Type: "[]Pet",
+					},
+					{
+						Type: "error",
+					},
+				},
+			},
+			want: `// GetPetsByTags gets multiple pets by tags
+func (c *Client) GetPetsByTags(tags ...string) ([]Pet, error) {
+}
+`,
+		},
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			f := &FuncBuilder{

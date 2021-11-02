@@ -24,8 +24,9 @@ type Function interface {
 }
 
 type Parameter struct {
-	Name string
-	Type string
+	Name     string
+	Type     string
+	Variadic bool
 }
 
 type FuncBuilder struct {
@@ -64,13 +65,16 @@ func (f *FuncBuilder) Signature() string {
 			b.WriteString(" ")
 		}
 
+		if p.Variadic {
+			b.WriteString("...")
+		}
 		b.WriteString(p.Type)
 	}
 	b.WriteRune(')')
+	b.WriteString(" ")
 
 	// Return type
 	if len(f.returnType) > 1 {
-		b.WriteString(" ")
 		b.WriteString("(")
 	}
 	for i, p := range f.returnType {
