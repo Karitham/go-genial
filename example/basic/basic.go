@@ -1,16 +1,12 @@
-# go-genial
+package main
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/Karitham/go-genial.svg)](https://pkg.go.dev/github.com/Karitham/go-genial)
+import (
+	"fmt"
 
-A prototype code-generator library for golang.
+	"github.com/karitham/go-genial"
+)
 
-## Install
-
-`go get github.com/karitham/go-genial`
-
-## Example
-
-```go
+func main() {
 	t := &genial.StructBuilder{}
 	t.Comment("Baz is a implementation of Iface").
 		Name("Baz").
@@ -60,27 +56,4 @@ A prototype code-generator library for golang.
 		Name("example")
 
 	fmt.Println(p.String())
-```
-
-generates
-
-```go
-// example is an example package
-package example
-
-// Baz is a implementation of Iface
-type Baz struct {
-	Foo *string `json:"foo,omitempty"`
 }
-
-// Iface is an example interface
-type Iface interface {
-	// FooBar is a new example function
-	FooBar(foo int, bar string) (int, error)
-}
-
-// FooBar is a new example function
-func (b *Baz) FooBar(foo int, bar string) (int, error) {
-	panic("not implemented")
-}
-```
