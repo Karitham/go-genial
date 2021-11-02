@@ -18,7 +18,7 @@ import (
 func main() {
 	f := &genial.FuncBuilder{}
 	f.Comment("FooBar is a new example function")
-    f.Name("FooBar").Parameters(
+	f.Name("FooBar").Parameters(
 			genial.Parameter{
 				Name: "foo",
 				Type: "int",
@@ -28,7 +28,7 @@ func main() {
 			},
 		)
 
-    f.Write([]byte("\tpanic(\"not implemented\")\n"))
+	f.Write([]byte("\tpanic(\"not implemented\")\n"))
 
 	i := &genial.IfaceBuilder{}
 	i.Comment("Iface is an example interface").Functions(f).Name("Iface")
@@ -43,12 +43,12 @@ generates
 ```go
 // FooBar is a new example function
 func FooBar(foo int, bar string) {
-    panic("not implemented")
+	panic("not implemented")
 }
 
 // Iface is an example interface
 type Iface interface {
-    // FooBar is a new example function
-    FooBar(foo int, bar string)
+	// FooBar is a new example function
+	FooBar(foo int, bar string)
 }
 ```
