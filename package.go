@@ -2,12 +2,13 @@ package genial
 
 import "strings"
 
-type PackageBuilder struct {
+type PackageB struct {
 	comment string
+	license string
 	name    string
 	imports []string
 
-	blocks []Stringer
+	decl []Stringer
 }
 
 type Stringer interface {
@@ -16,39 +17,49 @@ type Stringer interface {
 
 type Package interface {
 	Comment(string) Package
+	License(string) Package
 	Name(string) Package
 	Imports(...string) Package
-	Blocks(...Stringer) Package
+	Declarations(...Stringer) Package
 
 	String() string
 }
 
-func (p *PackageBuilder) Blocks(b ...Stringer) Package {
-	p.blocks = append(p.blocks, b...)
+func (p *PackageB) License(s string) Package {
+	p.license = s
 	return p
 }
 
-func (p *PackageBuilder) Comment(c string) Package {
+func (p *PackageB) Declarations(b ...Stringer) Package {
+	p.decl = append(p.decl, b...)
+	return p
+}
+
+func (p *PackageB) Comment(c string) Package {
 	p.comment = c
 	return p
 }
 
-func (p *PackageBuilder) Name(n string) Package {
+func (p *PackageB) Name(n string) Package {
 	p.name = n
-
 	return p
 }
 
-func (p *PackageBuilder) Imports(i ...string) Package {
+func (p *PackageB) Imports(i ...string) Package {
 	p.imports = append(p.imports, i...)
 	return p
 }
 
 // String returns the string representation of the package.
 // TODO(@Karitham): Add tests for this.
-// TODO(@Karitham): Add support for License header.
-func (p *PackageBuilder) String() string {
+func (p *PackageB) String() string {
 	b := &strings.Builder{}
+
+	if p.license != "" {
+		b.WriteString("//")
+		b.WriteString(commentSanitizer.Replace(p.license))
+		b.WriteString("\n\n")
+	}
 
 	if p.comment != "" {
 		b.WriteString("// ")
@@ -77,7 +88,7 @@ func (p *PackageBuilder) String() string {
 		b.WriteString(")\n")
 	}
 
-	for _, block := range p.blocks {
+	for _, block := range p.decl {
 		b.WriteString("\n")
 		b.WriteString(block.String())
 	}

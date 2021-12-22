@@ -19,7 +19,7 @@ func TestIfaceBuilder_String(t *testing.T) {
 				comment: "IfaceTest tests iface",
 				name:    "IfaceTest",
 				signaturers: []Signaturer{
-					(&FuncBuilder{}).
+					(&FuncB{}).
 						Comment("GetPetByID basic function comment").
 						Name("GetPetByID").
 						Parameters(
@@ -34,7 +34,7 @@ func TestIfaceBuilder_String(t *testing.T) {
 							Type: "error",
 						},
 					),
-					(&FuncBuilder{}).
+					(&FuncB{}).
 						Comment("GetPetsByTag function comment").
 						Name("GetPetsByTag").
 						Parameters(Parameter{
@@ -62,7 +62,7 @@ type IfaceTest interface {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			i := &IfaceBuilder{
+			i := &InterfaceB{
 				comment:     tt.fields.comment,
 				name:        tt.fields.name,
 				signaturers: tt.fields.signaturers,

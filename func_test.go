@@ -96,7 +96,7 @@ func (c *Client) GetPetsByTags(tags ...string) ([]Pet, error) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			f := &FuncBuilder{
+			f := &FuncB{
 				comment:    tt.fields.comment,
 				name:       tt.fields.name,
 				receiver:   tt.fields.receiver,

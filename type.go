@@ -13,9 +13,8 @@ type Field struct {
 }
 
 type StructTag struct {
-	Type      string // json:
-	Value     string // "value"
-	Omitempty bool   // ,omitempty
+	Type  string // json:
+	Value string // "value"
 }
 
 type Struct interface {
@@ -26,30 +25,30 @@ type Struct interface {
 	String() string
 }
 
-type StructBuilder struct {
+type StructB struct {
 	name    string
 	comment string
 	fields  []Field
 }
 
-func (s *StructBuilder) Comment(comment string) Struct {
+func (s *StructB) Comment(comment string) Struct {
 	s.comment = comment
 	return s
 }
 
-func (s *StructBuilder) Name(name string) Struct {
+func (s *StructB) Name(name string) Struct {
 	s.name = name
 	return s
 }
 
-func (s *StructBuilder) Fields(fields ...Field) Struct {
-	s.fields = fields
+func (s *StructB) Fields(fields ...Field) Struct {
+	s.fields = append(s.fields, fields...)
 	return s
 }
 
 var tabbedCommentSanitizer = strings.NewReplacer("\n", "\n\t// ")
 
-func (s *StructBuilder) String() string {
+func (s *StructB) String() string {
 	buf := &bytes.Buffer{}
 
 	if s.comment != "" {
@@ -80,9 +79,6 @@ func (s *StructBuilder) String() string {
 				buf.WriteString(tag.Type)
 				buf.WriteString(`:"`)
 				buf.WriteString(tag.Value)
-				if tag.Omitempty {
-					buf.WriteString(`,omitempty`)
-				}
 				buf.WriteString(`"`)
 			}
 			buf.WriteString("`")

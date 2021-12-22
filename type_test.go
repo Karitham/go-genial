@@ -25,9 +25,8 @@ func TestStructBuilder_String(t *testing.T) {
 						Comment: "This is a basic struct for testing",
 						Tag: []StructTag{
 							{
-								Type:      "json",
-								Value:     "test_field",
-								Omitempty: false,
+								Type:  "json",
+								Value: "test_field",
 							},
 						},
 					},
@@ -52,9 +51,8 @@ type TestStruct struct {
 						Comment: "This is a basic struct for testing",
 						Tag: []StructTag{
 							{
-								Type:      "json",
-								Value:     "test_field",
-								Omitempty: true,
+								Type:  "json",
+								Value: "test_field",
 							},
 						},
 					},
@@ -63,7 +61,7 @@ type TestStruct struct {
 			want: `// This is a basic comment for testing
 type TestStruct struct {
 	// This is a basic struct for testing
-	TestField string ` + "`json:\"test_field,omitempty\"`" + `
+	TestField string ` + "`json:\"test_field\"`" + `
 }
 `,
 		},
@@ -79,14 +77,12 @@ type TestStruct struct {
 						Comment: "This is a basic struct for testing",
 						Tag: []StructTag{
 							{
-								Type:      "json",
-								Value:     "test_field",
-								Omitempty: true,
+								Type:  "json",
+								Value: "test_field",
 							},
 							{
-								Type:      "db",
-								Value:     "test_field_db",
-								Omitempty: false,
+								Type:  "db",
+								Value: "test_field_db",
 							},
 						},
 					},
@@ -95,14 +91,14 @@ type TestStruct struct {
 			want: `// This is a basic comment for testing
 type TestStruct struct {
 	// This is a basic struct for testing
-	TestField string ` + "`json:\"test_field,omitempty\" db:\"test_field_db\"`" + `
+	TestField string ` + "`json:\"test_field\" db:\"test_field_db\"`" + `
 }
 `,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			s := &StructBuilder{
+			s := &StructB{
 				name:    tt.fields.name,
 				fields:  tt.fields.fields,
 				comment: tt.fields.comment,

@@ -7,7 +7,7 @@ import (
 type Interface interface {
 	Name(string) Interface
 	Comment(string) Interface
-	Functions(...Signaturer) Interface
+	Members(...Signaturer) Interface
 
 	String() string
 }
@@ -17,29 +17,29 @@ type Signaturer interface {
 	Signature() string
 }
 
-type IfaceBuilder struct {
+type InterfaceB struct {
 	comment     string
 	name        string
 	signaturers []Signaturer
 }
 
-func (i *IfaceBuilder) Functions(s ...Signaturer) Interface {
+func (i *InterfaceB) Members(s ...Signaturer) Interface {
 	i.signaturers = append(i.signaturers, s...)
 	return i
 }
 
-func (ifb *IfaceBuilder) Comment(comment string) Interface {
+func (ifb *InterfaceB) Comment(comment string) Interface {
 	ifb.comment = comment
 	return ifb
 }
 
-func (ifb *IfaceBuilder) Name(n string) Interface {
+func (ifb *InterfaceB) Name(n string) Interface {
 	ifb.name = n
 	return ifb
 }
 
 // String returns a string representation of the iface
-func (i *IfaceBuilder) String() string {
+func (i *InterfaceB) String() string {
 	b := &strings.Builder{}
 
 	// comment

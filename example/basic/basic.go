@@ -7,30 +7,33 @@ import (
 )
 
 func main() {
-	t := &genial.StructBuilder{}
+	t := &genial.StructB{}
 	t.Comment("Baz is a implementation of Iface").
 		Name("Baz").
 		Fields(genial.Field{
 			Name: "Foo",
 			Type: "*string",
 			Tag: []genial.StructTag{
-				{Type: "json", Value: "foo", Omitempty: true},
+				{Type: "json", Value: "foo,omitempty"},
 			},
 		},
 		)
 
-	f := &genial.FuncBuilder{}
+	f := &genial.FuncB{}
 	f.Comment("FooBar is a new example function").
 		Name("FooBar").
-		Receiver(genial.Parameter{
-			Name: "b",
-			Type: "*Baz",
-		}).
+		Receiver(
+			genial.Parameter{
+				Name: "b",
+				Type: "*Baz",
+			},
+		).
 		Parameters(
 			genial.Parameter{
 				Name: "foo",
 				Type: "int",
-			}, genial.Parameter{
+			},
+			genial.Parameter{
 				Name: "bar",
 				Type: "string",
 			},
@@ -45,14 +48,14 @@ func main() {
 		).
 		Write([]byte("\tpanic(\"not implemented\")\n"))
 
-	i := &genial.IfaceBuilder{}
+	i := &genial.InterfaceB{}
 	i.Comment("Iface is an example interface").
-		Functions(f).Name("Iface")
+		Members(f).
+		Name("Iface")
 
-	p := &genial.PackageBuilder{}
-
+	p := &genial.PackageB{}
 	p.Comment("example is an example package").
-		Blocks(t, i, f).
+		Declarations(t, i, f).
 		Name("example")
 
 	fmt.Println(p.String())

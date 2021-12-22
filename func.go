@@ -29,7 +29,7 @@ type Parameter struct {
 	Variadic bool
 }
 
-type FuncBuilder struct {
+type FuncB struct {
 	comment    string
 	name       string
 	receiver   Parameter
@@ -38,7 +38,7 @@ type FuncBuilder struct {
 	body       *bytes.Buffer
 }
 
-func (f *FuncBuilder) Description() string {
+func (f *FuncB) Description() string {
 	if f.comment == "" {
 		return ""
 	}
@@ -50,7 +50,7 @@ func (f *FuncBuilder) Description() string {
 	return b.String()
 }
 
-func (f *FuncBuilder) Signature() string {
+func (f *FuncB) Signature() string {
 	b := &bytes.Buffer{}
 
 	b.WriteString(f.name)
@@ -95,22 +95,22 @@ func (f *FuncBuilder) Signature() string {
 	return b.String()
 }
 
-func (f *FuncBuilder) Comment(c string) Function {
+func (f *FuncB) Comment(c string) Function {
 	f.comment = c
 	return f
 }
 
-func (f *FuncBuilder) Name(n string) Function {
+func (f *FuncB) Name(n string) Function {
 	f.name = n
 	return f
 }
 
-func (f *FuncBuilder) Receiver(p Parameter) Function {
+func (f *FuncB) Receiver(p Parameter) Function {
 	f.receiver = p
 	return f
 }
 
-func (f *FuncBuilder) Parameters(p ...Parameter) Function {
+func (f *FuncB) Parameters(p ...Parameter) Function {
 	for _, t := range p {
 		if t.Name == "" {
 			log.Panicf("Parameter name must not be empty for type: %s", t.Type)
@@ -120,7 +120,7 @@ func (f *FuncBuilder) Parameters(p ...Parameter) Function {
 	return f
 }
 
-func (f *FuncBuilder) ReturnTypes(p ...Parameter) Function {
+func (f *FuncB) ReturnTypes(p ...Parameter) Function {
 	for _, t := range p {
 		if t.Name != "" {
 			for i := range f.returnType {
@@ -138,7 +138,7 @@ func (f *FuncBuilder) ReturnTypes(p ...Parameter) Function {
 	return f
 }
 
-func (f *FuncBuilder) Write(b []byte) (n int, err error) {
+func (f *FuncB) Write(b []byte) (n int, err error) {
 	if f.body == nil {
 		f.body = &bytes.Buffer{}
 	}
@@ -148,7 +148,7 @@ func (f *FuncBuilder) Write(b []byte) (n int, err error) {
 var commentSanitizer = strings.NewReplacer("\n", "\n// ")
 
 // String returns a string representation of the function
-func (f *FuncBuilder) String() string {
+func (f *FuncB) String() string {
 	b := &strings.Builder{}
 
 	// top level comment
