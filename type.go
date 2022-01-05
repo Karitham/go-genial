@@ -27,7 +27,7 @@ type Struct interface {
 	Name(string) Struct
 	Namef(string, ...interface{}) Struct
 	Fields(...Field) Struct
-	Field(string, string) Struct
+	Field(string, string, ...StructTag) Struct
 
 	String() string
 }
@@ -68,10 +68,11 @@ func (s *StructB) Fields(fields ...Field) Struct {
 }
 
 // Field appends a basic field
-func (s *StructB) Field(name string, typeName string) Struct {
+func (s *StructB) Field(name string, typeName string, tags ...StructTag) Struct {
 	return s.Fields(Field{
 		Name: name,
 		Type: typeName,
+		Tag:  tags,
 	})
 }
 

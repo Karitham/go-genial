@@ -51,9 +51,12 @@ generates
 // example is an example package
 package example
 
+import "encoding/json"
+
 // Baz is a implementation of Iface
 type Baz struct {
 	Foo *string `json:"foo,omitempty"`
+	rest json.Raw
 }
 
 // Iface is an example interface

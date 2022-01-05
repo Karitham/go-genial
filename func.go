@@ -17,10 +17,15 @@ type Function interface {
 
 	Name(string) Function
 	Namef(string, ...interface{}) Function
+
 	Comment(string) Function
 	Commentf(string, ...interface{}) Function
+
 	Receiver(name string, typ string) Function
+
 	Parameters(...Parameter) Function
+	Parameter(name string, typ string) Function
+
 	ReturnTypes(...string) Function
 
 	Description() string
@@ -143,6 +148,11 @@ func (f *FuncB) Parameters(p ...Parameter) Function {
 	}
 	f.parameters = append(f.parameters, p...)
 	return f
+}
+
+// Parameter adds a single parameter to the function
+func (f *FuncB) Parameter(name string, typ string) Function {
+	return f.Parameters(Parameter{Name: name, Type: typ})
 }
 
 // ReturnTypes sets the return types of the function

@@ -81,7 +81,7 @@ func (p *PackageB) String() string {
 
 	b.WriteString("package ")
 	b.WriteString(p.name)
-	b.WriteString("\n")
+	b.WriteString("\n\n")
 
 	switch len(p.imports) {
 	case 0:
@@ -89,13 +89,13 @@ func (p *PackageB) String() string {
 	case 1:
 		b.WriteString(`import "`)
 		b.WriteString(p.imports[0])
-		b.WriteString(`\n`)
+		b.WriteString("\"\n")
 	default:
 		b.WriteString("import (\n")
 		for _, i := range p.imports {
-			b.WriteString(`\t"`)
+			b.WriteString("\t\"")
 			b.WriteString(i)
-			b.WriteString(`"\n`)
+			b.WriteString("\"\n")
 		}
 		b.WriteString(")\n")
 	}

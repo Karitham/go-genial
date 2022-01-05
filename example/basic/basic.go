@@ -7,6 +7,11 @@ import (
 )
 
 func main() {
+	p := &genial.PackageB{}
+	p.Comment("example is an example package").
+		Name("example").
+		Imports("encoding/json")
+
 	t := &genial.StructB{}
 	t.Comment("Baz is a implementation of Iface").
 		Name("Baz").
@@ -14,8 +19,8 @@ func main() {
 			Name: "Foo",
 			Type: "*string",
 			Tag:  []genial.StructTag{{Type: "json", Value: "foo,omitempty"}},
-		},
-		)
+		}).
+		Field("rest", "json.Raw")
 
 	f := &genial.FuncB{}
 	f.Comment("FooBar is a new example function").
@@ -33,10 +38,5 @@ func main() {
 		Members(f).
 		Name("Iface")
 
-	p := &genial.PackageB{}
-	p.Comment("example is an example package").
-		Declarations(t, i, f).
-		Name("example")
-
-	fmt.Println(p.String())
+	fmt.Println(p.Declarations(t, i, f).String())
 }
