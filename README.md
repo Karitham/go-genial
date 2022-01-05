@@ -14,21 +14,14 @@ A prototype code-generator library for golang.
 	t := &genial.StructB{}
 	t.Comment("Baz is a implementation of Iface").
 		Name("Baz").
-		Fields(genial.Field{
-			Name: "Foo",
-			Type: "*string",
-			Tag:  []genial.StructTag{{Type: "json", Value: "foo,omitempty"}},
-		},
-		)
+		Field("Foo", "*string", genial.StructTag{Type: "json", Value: "foo,omitempty"})
 
 	f := &genial.FuncB{}
 	f.Comment("FooBar is a new example function").
 		Name("FooBar").
 		Receiver("b", "*Baz").
-		Parameters(
-			genial.Parameter{Name: "foo", Type: "int"},
-			genial.Parameter{Name: "bar", Type: "string"},
-		).
+		Parameter("foo", "int").
+		Parameter("bar", "string").
 		ReturnTypes("int", "error").
 		WriteString("\tpanic(\"not implemented\")\n")
 
