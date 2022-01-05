@@ -13,40 +13,20 @@ func main() {
 		Fields(genial.Field{
 			Name: "Foo",
 			Type: "*string",
-			Tag: []genial.StructTag{
-				{Type: "json", Value: "foo,omitempty"},
-			},
+			Tag:  []genial.StructTag{{Type: "json", Value: "foo,omitempty"}},
 		},
 		)
 
 	f := &genial.FuncB{}
 	f.Comment("FooBar is a new example function").
 		Name("FooBar").
-		Receiver(
-			genial.Parameter{
-				Name: "b",
-				Type: "*Baz",
-			},
-		).
+		Receiver("b", "*Baz").
 		Parameters(
-			genial.Parameter{
-				Name: "foo",
-				Type: "int",
-			},
-			genial.Parameter{
-				Name: "bar",
-				Type: "string",
-			},
+			genial.Parameter{Name: "foo", Type: "int"},
+			genial.Parameter{Name: "bar", Type: "string"},
 		).
-		ReturnTypes(
-			genial.Parameter{
-				Type: "int",
-			},
-			genial.Parameter{
-				Type: "error",
-			},
-		).
-		Write([]byte("\tpanic(\"not implemented\")\n"))
+		ReturnTypes("int", "error").
+		WriteString("\tpanic(\"not implemented\")\n")
 
 	i := &genial.InterfaceB{}
 	i.Comment("Iface is an example interface").

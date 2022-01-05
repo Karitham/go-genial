@@ -2,20 +2,26 @@ package genial
 
 import (
 	"bytes"
+	"fmt"
 	"io"
 	"log"
 	"strings"
 )
 
+// Function is a function
 type Function interface {
 	// to write the body
 	io.Writer
+	Writef(format string, a ...interface{}) (n int, err error)
+	WriteString(s string) (n int, err error)
 
 	Name(string) Function
+	Namef(string, ...interface{}) Function
 	Comment(string) Function
-	Receiver(Parameter) Function
+	Commentf(string, ...interface{}) Function
+	Receiver(name string, typ string) Function
 	Parameters(...Parameter) Function
-	ReturnTypes(...Parameter) Function
+	ReturnTypes(...string) Function
 
 	Description() string
 	Signature() string
@@ -23,12 +29,14 @@ type Function interface {
 	String() string
 }
 
+// Parameter is a go function parameter
 type Parameter struct {
 	Name     string
 	Type     string
 	Variadic bool
 }
 
+// FuncB is a function builder
 type FuncB struct {
 	comment    string
 	name       string
@@ -38,6 +46,7 @@ type FuncB struct {
 	body       *bytes.Buffer
 }
 
+// Description returns the description of the function, (as in, the top level comment)
 func (f *FuncB) Description() string {
 	if f.comment == "" {
 		return ""
@@ -50,6 +59,8 @@ func (f *FuncB) Description() string {
 	return b.String()
 }
 
+// Signature returns the signature of the function
+// Useful for the interface builder
 func (f *FuncB) Signature() string {
 	b := &bytes.Buffer{}
 
@@ -95,21 +106,35 @@ func (f *FuncB) Signature() string {
 	return b.String()
 }
 
+// Comment sets the comment of the function
 func (f *FuncB) Comment(c string) Function {
 	f.comment = c
 	return f
 }
 
+// Commentf sets the comment using fmt.Sprintf
+func (f *FuncB) Commentf(format string, a ...interface{}) Function {
+	return f.Comment(fmt.Sprintf(format, a...))
+}
+
+// Name sets the name of the function
 func (f *FuncB) Name(n string) Function {
 	f.name = n
 	return f
 }
 
-func (f *FuncB) Receiver(p Parameter) Function {
-	f.receiver = p
+// Namef sets the name of the function using fmt.Sprintf
+func (f *FuncB) Namef(format string, a ...interface{}) Function {
+	return f.Name(fmt.Sprintf(format, a...))
+}
+
+// Receiver sets the receiver of the function
+func (f *FuncB) Receiver(name string, typ string) Function {
+	f.receiver = Parameter{Name: name, Type: typ}
 	return f
 }
 
+// Parameters sets the parameters of the function
 func (f *FuncB) Parameters(p ...Parameter) Function {
 	for _, t := range p {
 		if t.Name == "" {
@@ -120,29 +145,36 @@ func (f *FuncB) Parameters(p ...Parameter) Function {
 	return f
 }
 
-func (f *FuncB) ReturnTypes(p ...Parameter) Function {
+// ReturnTypes sets the return types of the function
+func (f *FuncB) ReturnTypes(p ...string) Function {
 	for _, t := range p {
-		if t.Name != "" {
-			for i := range f.returnType {
-				if f.returnType[i].Name == "" {
-					f.returnType[i].Name = f.returnType[i].Type[:1]
-				}
-
-				if f.returnType[i].Name == t.Name {
-					f.returnType[i].Name = f.returnType[i].Name + "1"
-				}
-			}
-		}
+		f.returnType = append(f.returnType, Parameter{Type: t})
 	}
-	f.returnType = append(f.returnType, p...)
 	return f
 }
 
+// Write directly into the body of the function
 func (f *FuncB) Write(b []byte) (n int, err error) {
 	if f.body == nil {
 		f.body = &bytes.Buffer{}
 	}
 	return f.body.Write(b)
+}
+
+// WriteString writes a string into the body of the function
+func (f *FuncB) WriteString(s string) (n int, err error) {
+	if f.body == nil {
+		f.body = &bytes.Buffer{}
+	}
+	return f.body.WriteString(s)
+}
+
+// Writef writes directly to the body of the function using fmt.Sprintf
+func (f *FuncB) Writef(format string, a ...interface{}) (n int, err error) {
+	if f.body == nil {
+		f.body = &bytes.Buffer{}
+	}
+	return f.body.WriteString(fmt.Sprintf(format, a...))
 }
 
 var commentSanitizer = strings.NewReplacer("\n", "\n// ")

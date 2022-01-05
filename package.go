@@ -1,50 +1,62 @@
 package genial
 
-import "strings"
+import (
+	"fmt"
+	"strings"
+)
 
+// PackageB is a package builder
 type PackageB struct {
 	comment string
 	license string
 	name    string
 	imports []string
 
-	decl []Stringer
+	decl []fmt.Stringer
 }
 
-type Stringer interface {
-	String() string
-}
-
+// Package is a golang package (more like a file)
 type Package interface {
 	Comment(string) Package
 	License(string) Package
 	Name(string) Package
+	Namef(string, ...interface{}) Package
 	Imports(...string) Package
-	Declarations(...Stringer) Package
+	Declarations(...fmt.Stringer) Package
 
 	String() string
 }
 
+// License sets the license header for the generated code
 func (p *PackageB) License(s string) Package {
 	p.license = s
 	return p
 }
 
-func (p *PackageB) Declarations(b ...Stringer) Package {
+// Declarations sets the declarations for the package
+func (p *PackageB) Declarations(b ...fmt.Stringer) Package {
 	p.decl = append(p.decl, b...)
 	return p
 }
 
+// Comment sets the comment for the package
 func (p *PackageB) Comment(c string) Package {
 	p.comment = c
 	return p
 }
 
+// Name sets the name of the package
 func (p *PackageB) Name(n string) Package {
 	p.name = n
 	return p
 }
 
+// Namef sets the name of the package using fmt.Sprintf
+func (p *PackageB) Namef(format string, args ...interface{}) Package {
+	return p.Name(fmt.Sprintf(format, args...))
+}
+
+// Imports appends to imports
 func (p *PackageB) Imports(i ...string) Package {
 	p.imports = append(p.imports, i...)
 	return p
@@ -77,7 +89,7 @@ func (p *PackageB) String() string {
 	case 1:
 		b.WriteString(`import "`)
 		b.WriteString(p.imports[0])
-		b.WriteString(`"\n`)
+		b.WriteString(`\n`)
 	default:
 		b.WriteString("import (\n")
 		for _, i := range p.imports {
