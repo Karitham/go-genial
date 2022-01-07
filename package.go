@@ -62,7 +62,6 @@ func (p *PackageB) Imports(i ...string) *PackageB {
 }
 
 // String returns the string representation of the package.
-// TODO(@Karitham): Add tests for this.
 func (p *PackageB) String() string {
 	if p.b == nil {
 		p.fillBuf()
@@ -72,6 +71,9 @@ func (p *PackageB) String() string {
 
 // WriteTo writes the package to the given writer.
 func (p *PackageB) WriteTo(w io.Writer) (int64, error) {
+	if p.b == nil {
+		p.b = &bytes.Buffer{}
+	}
 	return p.b.WriteTo(w)
 }
 
@@ -84,6 +86,7 @@ func (p *PackageB) Bytes() []byte {
 }
 
 // fillBuf fills the package buffer
+// TODO(@Karitham): Add tests for this.
 func (p *PackageB) fillBuf() {
 	b := &bytes.Buffer{}
 	b.Write(p.licenseB())
@@ -92,7 +95,7 @@ func (p *PackageB) fillBuf() {
 	b.Write(p.importsB())
 
 	for _, block := range p.decl {
-		b.WriteString("\n")
+		b.WriteRune('\n')
 		b.Write(block.Bytes())
 	}
 
