@@ -22,15 +22,12 @@ func TestIfaceBuilder_String(t *testing.T) {
 					(&FuncB{}).
 						Comment("GetPetByID basic function comment").
 						Name("GetPetByID").
-						Parameters(Parameter{Name: "id", Type: "int"}).
+						Parameter("id", "int").
 						ReturnTypes("*Pet", "error"),
 					(&FuncB{}).
 						Comment("GetPetsByTag function comment").
 						Name("GetPetsByTag").
-						Parameters(Parameter{
-							Name: "tag",
-							Type: "[]string",
-						}).
+						Parameter("tag", "[]string").
 						ReturnTypes("[]Pet", "error"),
 				},
 			},

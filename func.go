@@ -3,36 +3,9 @@ package genial
 import (
 	"bytes"
 	"fmt"
-	"io"
 	"log"
 	"strings"
 )
-
-// Function is a function
-type Function interface {
-	// to write the body
-	io.Writer
-	Writef(format string, a ...interface{}) (n int, err error)
-	WriteString(s string) (n int, err error)
-
-	Name(string) Function
-	Namef(string, ...interface{}) Function
-
-	Comment(string) Function
-	Commentf(string, ...interface{}) Function
-
-	Receiver(name string, typ string) Function
-
-	Parameters(...Parameter) Function
-	Parameter(name string, typ string) Function
-
-	ReturnTypes(...string) Function
-
-	Description() string
-	Signature() string
-
-	String() string
-}
 
 // Parameter is a go function parameter
 type Parameter struct {
@@ -52,21 +25,21 @@ type FuncB struct {
 }
 
 // Description returns the description of the function, (as in, the top level comment)
-func (f *FuncB) Description() string {
+func (f *FuncB) Description() []byte {
 	if f.comment == "" {
-		return ""
+		return nil
 	}
 
 	b := &bytes.Buffer{}
 	b.WriteString("// ")
 	b.WriteString(commentSanitizer.Replace(f.comment))
 	b.WriteString("\n")
-	return b.String()
+	return b.Bytes()
 }
 
 // Signature returns the signature of the function
 // Useful for the interface builder
-func (f *FuncB) Signature() string {
+func (f *FuncB) Signature() []byte {
 	b := &bytes.Buffer{}
 
 	b.WriteString(f.name)
@@ -108,39 +81,39 @@ func (f *FuncB) Signature() string {
 		b.WriteRune(')')
 	}
 
-	return b.String()
+	return b.Bytes()
 }
 
 // Comment sets the comment of the function
-func (f *FuncB) Comment(c string) Function {
+func (f *FuncB) Comment(c string) *FuncB {
 	f.comment = c
 	return f
 }
 
 // Commentf sets the comment using fmt.Sprintf
-func (f *FuncB) Commentf(format string, a ...interface{}) Function {
+func (f *FuncB) Commentf(format string, a ...interface{}) *FuncB {
 	return f.Comment(fmt.Sprintf(format, a...))
 }
 
 // Name sets the name of the function
-func (f *FuncB) Name(n string) Function {
+func (f *FuncB) Name(n string) *FuncB {
 	f.name = n
 	return f
 }
 
 // Namef sets the name of the function using fmt.Sprintf
-func (f *FuncB) Namef(format string, a ...interface{}) Function {
+func (f *FuncB) Namef(format string, a ...interface{}) *FuncB {
 	return f.Name(fmt.Sprintf(format, a...))
 }
 
 // Receiver sets the receiver of the function
-func (f *FuncB) Receiver(name string, typ string) Function {
+func (f *FuncB) Receiver(name string, typ string) *FuncB {
 	f.receiver = Parameter{Name: name, Type: typ}
 	return f
 }
 
 // Parameters sets the parameters of the function
-func (f *FuncB) Parameters(p ...Parameter) Function {
+func (f *FuncB) Parameters(p ...Parameter) *FuncB {
 	for _, t := range p {
 		if t.Name == "" {
 			log.Panicf("Parameter name must not be empty for type: %s", t.Type)
@@ -151,12 +124,12 @@ func (f *FuncB) Parameters(p ...Parameter) Function {
 }
 
 // Parameter adds a single parameter to the function
-func (f *FuncB) Parameter(name string, typ string) Function {
+func (f *FuncB) Parameter(name string, typ string) *FuncB {
 	return f.Parameters(Parameter{Name: name, Type: typ})
 }
 
 // ReturnTypes sets the return types of the function
-func (f *FuncB) ReturnTypes(p ...string) Function {
+func (f *FuncB) ReturnTypes(p ...string) *FuncB {
 	for _, t := range p {
 		f.returnType = append(f.returnType, Parameter{Type: t})
 	}
@@ -184,17 +157,22 @@ func (f *FuncB) Writef(format string, a ...interface{}) (n int, err error) {
 	if f.body == nil {
 		f.body = &bytes.Buffer{}
 	}
-	return f.body.WriteString(fmt.Sprintf(format, a...))
+	return fmt.Fprintf(f.body, format, a...)
 }
 
 var commentSanitizer = strings.NewReplacer("\n", "\n// ")
 
 // String returns a string representation of the function
 func (f *FuncB) String() string {
-	b := &strings.Builder{}
+	return string(f.Bytes())
+}
+
+// Bytes returns the bytes of the function
+func (f *FuncB) Bytes() []byte {
+	b := &bytes.Buffer{}
 
 	// top level comment
-	b.WriteString(f.Description())
+	b.Write(f.Description())
 
 	b.WriteString("func ")
 
@@ -208,8 +186,7 @@ func (f *FuncB) String() string {
 		b.WriteString(" ")
 	}
 
-	b.WriteString(f.Signature())
-
+	b.Write(f.Signature())
 	b.WriteString(" {\n")
 
 	// Body
@@ -218,5 +195,5 @@ func (f *FuncB) String() string {
 	}
 
 	b.WriteString("}\n")
-	return b.String()
+	return b.Bytes()
 }

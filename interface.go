@@ -1,26 +1,15 @@
 package genial
 
 import (
+	"bytes"
 	"fmt"
-	"strings"
 )
-
-// Interface is a go interface
-type Interface interface {
-	Name(string) Interface
-	Namef(string, ...interface{}) Interface
-	Comment(string) Interface
-	Commentf(string, ...interface{}) Interface
-	Members(...Signaturer) Interface
-
-	String() string
-}
 
 // Signaturer is implemented by functions,
 // which enables us to pass them to the interface builder
 type Signaturer interface {
-	Description() string
-	Signature() string
+	Description() []byte
+	Signature() []byte
 }
 
 // InterfaceB is an interface builder
@@ -31,36 +20,41 @@ type InterfaceB struct {
 }
 
 // Members adds members to the interface
-func (i *InterfaceB) Members(s ...Signaturer) Interface {
+func (i *InterfaceB) Members(s ...Signaturer) *InterfaceB {
 	i.signaturers = append(i.signaturers, s...)
 	return i
 }
 
 // Comment sets the comment on the interface
-func (i *InterfaceB) Comment(comment string) Interface {
+func (i *InterfaceB) Comment(comment string) *InterfaceB {
 	i.comment = comment
 	return i
 }
 
 // Commentf sets the comment on the interface using fmt.Sprintf
-func (i *InterfaceB) Commentf(format string, args ...interface{}) Interface {
+func (i *InterfaceB) Commentf(format string, args ...interface{}) *InterfaceB {
 	return i.Comment(fmt.Sprintf(format, args...))
 }
 
 // Name sets the name of the interface
-func (i *InterfaceB) Name(n string) Interface {
+func (i *InterfaceB) Name(n string) *InterfaceB {
 	i.name = n
 	return i
 }
 
 // Namef sets the name of the interface using fmt.Sprintf
-func (i *InterfaceB) Namef(format string, args ...interface{}) Interface {
+func (i *InterfaceB) Namef(format string, args ...interface{}) *InterfaceB {
 	return i.Name(fmt.Sprintf(format, args...))
 }
 
 // String returns a string representation of the iface
 func (i *InterfaceB) String() string {
-	b := &strings.Builder{}
+	return string(i.Bytes())
+}
+
+// Bytes  returns a byte representation of the iface
+func (i *InterfaceB) Bytes() []byte {
+	b := &bytes.Buffer{}
 
 	// comment
 	if i.comment != "" {
@@ -77,16 +71,16 @@ func (i *InterfaceB) String() string {
 	// functions
 	for _, s := range i.signaturers {
 		c := s.Description()
-		if c != "" {
+		if c != nil {
 			b.WriteString("\t")
-			b.WriteString(c)
+			b.Write(c)
 		}
 
 		b.WriteString("\t")
-		b.WriteString(s.Signature())
+		b.Write(s.Signature())
 		b.WriteString("\n")
 	}
 
 	b.WriteString("}\n")
-	return b.String()
+	return b.Bytes()
 }

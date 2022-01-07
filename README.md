@@ -2,7 +2,7 @@
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/Karitham/go-genial.svg)](https://pkg.go.dev/github.com/Karitham/go-genial)
 
-A prototype code-generator library for golang.
+A golang code-generation library
 
 ## Install
 
@@ -11,10 +11,16 @@ A prototype code-generator library for golang.
 ## Example
 
 ```go
+	p := &genial.PackageB{}
+	p.Comment("example is an example package").
+		Name("example").
+		Imports("encoding/json")
+
 	t := &genial.StructB{}
 	t.Comment("Baz is a implementation of Iface").
 		Name("Baz").
-		Field("Foo", "*string", genial.StructTag{Type: "json", Value: "foo,omitempty"})
+		Field("Foo", "*string", genial.StructTag{Type: "json", Value: "foo,omitempty"}).
+		Field("rest", "json.Raw")
 
 	f := &genial.FuncB{}
 	f.Comment("FooBar is a new example function").
@@ -23,19 +29,14 @@ A prototype code-generator library for golang.
 		Parameter("foo", "int").
 		Parameter("bar", "string").
 		ReturnTypes("int", "error").
-		WriteString("\tpanic(\"not implemented\")\n")
+		WriteString(`panic("not implemented")`)
 
 	i := &genial.InterfaceB{}
 	i.Comment("Iface is an example interface").
 		Members(f).
 		Name("Iface")
 
-	p := &genial.PackageB{}
-	p.Comment("example is an example package").
-		Declarations(t, i, f).
-		Name("example")
-
-	fmt.Println(p.String())
+	p.Declarations(t, i, f).WriteTo(os.Stdout)
 ```
 
 generates
@@ -48,7 +49,7 @@ import "encoding/json"
 
 // Baz is a implementation of Iface
 type Baz struct {
-	Foo *string `json:"foo,omitempty"`
+	Foo  *string `json:"foo,omitempty"`
 	rest json.Raw
 }
 
