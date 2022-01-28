@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"go/format"
 	"io"
+	"log"
 )
 
 type Byter interface {
@@ -72,7 +73,7 @@ func (p *PackageB) String() string {
 // WriteTo writes the package to the given writer.
 func (p *PackageB) WriteTo(w io.Writer) (int64, error) {
 	if p.b == nil {
-		p.b = &bytes.Buffer{}
+		p.fillBuf()
 	}
 	return p.b.WriteTo(w)
 }
@@ -88,18 +89,22 @@ func (p *PackageB) Bytes() []byte {
 // fillBuf fills the package buffer
 // TODO(@Karitham): Add tests for this.
 func (p *PackageB) fillBuf() {
-	b := &bytes.Buffer{}
-	b.Write(p.licenseB())
-	b.Write(p.commentB())
-	b.Write(p.packageB())
-	b.Write(p.importsB())
+	p.b = &bytes.Buffer{}
+	p.b.Write(p.licenseB())
+	p.b.Write(p.commentB())
+	p.b.Write(p.packageB())
+	p.b.Write(p.importsB())
 
 	for _, block := range p.decl {
-		b.WriteRune('\n')
-		b.Write(block.Bytes())
+		p.b.WriteRune('\n')
+		p.b.Write(block.Bytes())
 	}
 
-	bf, _ := format.Source(b.Bytes())
+	bf, err := format.Source(p.b.Bytes())
+	if err != nil {
+		log.Println("[WARN] formatting source code", err)
+		return
+	}
 	p.b = bytes.NewBuffer(bf)
 }
 
